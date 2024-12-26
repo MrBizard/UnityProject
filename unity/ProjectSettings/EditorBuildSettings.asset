@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Prototype 1.unity
     guid: 84729eeda748340d0955715b6a50b370
+  - enabled: 1
+    path: Assets/Scenes/ENDChronoScene.unity
+    guid: 213e5c46f345f834eac0d1c24b4e8f8e
   m_configObjects: {}

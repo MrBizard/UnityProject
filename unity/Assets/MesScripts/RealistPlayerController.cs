@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class RealistPlayerController : MonoBehaviour
 {
@@ -63,6 +64,17 @@ public class RealistPlayerController : MonoBehaviour
 
     private float horizontalInput;
     private float forwardInput;
+    //Game mode
+    public bool isChrono;
+    public float chronoTime = 10.0f;
+
+    //Text data
+    public TextMeshProUGUI TextTime;
+    public TextMeshProUGUI TextScore;
+    private string baseTimeText = "temps restant : ";
+    private string baseScoreText = "Score : ";
+    private string ScoreData;
+    private string TimeData;
 
 
     // Start is called before the first frame update
@@ -72,6 +84,11 @@ public class RealistPlayerController : MonoBehaviour
         speed = minSpeed;
         amplitudeSpeed = maxSpeed - minSpeed;
         RB = gameObject.GetComponent<Rigidbody>();
+        if (!isChrono)
+        { 
+            TextTime.enabled = false;
+            TextScore.enabled = false;
+        }
     }
 
 
@@ -148,9 +165,27 @@ public class RealistPlayerController : MonoBehaviour
                                                        //==> tourner // >> rotation
         rotationAdd = rotationAdd * Quaternion.AngleAxis(Time.fixedDeltaTime * turnspeed *
         horizontalInput, Vector3.up);
-        // Test sortie de route // appliquer le(s) rotation(s)
-        if ((positionRoute.position.y - transform.position.y) > this.GetComponent<Renderer>().bounds.size.y)
-            SceneManager.LoadScene("ENDscene");
+
+
+        if (isChrono)
+        {
+            //actualise le temps + l'affichage
+            chronoTime -= Time.deltaTime;
+            TimeData = Mathf.Round(chronoTime).ToString();
+            ScoreData = Mathf.Round(this.transform.position.z).ToString();
+            TextDisplay();
+            //Test de fin
+            if ((positionRoute.position.y - transform.position.y) > this.GetComponent<Renderer>().bounds.size.y)
+                SceneManager.LoadScene("ENDChronoScene");
+            if (chronoTime < 0.0f)
+                SceneManager.LoadScene("ENDChronoScene");
+        }
+        else
+        {
+            // Test sortie de route // appliquer le(s) rotation(s)
+            if ((positionRoute.position.y - transform.position.y) > this.GetComponent<Renderer>().bounds.size.y)
+                SceneManager.LoadScene("ENDscene");
+        }
 
     }
 
@@ -160,5 +195,11 @@ public class RealistPlayerController : MonoBehaviour
         RB.MoveRotation((RB.transform.rotation * rotationAdd).normalized);
         physicUpdateDone = true;
 
+    }
+
+    void TextDisplay()
+    {
+        TextTime.text = baseTimeText + TimeData;
+        TextScore.text = baseScoreText + ScoreData;
     }
 }
