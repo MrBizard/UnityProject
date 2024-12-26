@@ -1,15 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement; // pour utiliser SceneManager.
+using UnityEngine.SceneManagement;
+using TMPro;
+using System; // pour utiliser SceneManager.
 
 public class PlayerController : MonoBehaviour
 {
     public float speed = 20;
     public float turnspeed = 20;
     public Transform positionRoute;
-    
-    
+
+
     private  GameObject player;
 
 
@@ -32,12 +34,9 @@ public class PlayerController : MonoBehaviour
         transform.Translate(Vector3.forward * Time.deltaTime * speed     * verticalinput);
         transform.Rotate(   Vector3.up  ,     Time.deltaTime * turnspeed * horizontalinput);
 
-
-
         // Test sortie de route 
         if ((positionRoute.position.y - transform.position.y) > player.GetComponent<Renderer>().bounds.size.y)
             //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             SceneManager.LoadScene("ENDscene");
-
-    }   
+    }
 }
