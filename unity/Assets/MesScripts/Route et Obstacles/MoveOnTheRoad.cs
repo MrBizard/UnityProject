@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class MovingObstacle : MonoBehaviour
 {
-    private const float VITESSE_MIN = 5;
-    private const float VITESSE_MAX = 15;
+    public static float VITESSE_MIN = 5;
+    public static float VITESSE_MAX = 15;
     private bool VITESSE_ALEATOIRE = false;
+    public static float globalSpeed = 0;
 
     // tooltip permet un affichage contextuel dans l'IDE 
     [Tooltip("Vitesse de deplacement de l'objet sur la largeur de la route \n " +
              "si nulle, elle sera aléatoire à chaque nouveau déplacement \n")]
-    public float speed = VITESSE_MIN;
+    public float speed = 0;
 #if UNITY_EDITOR
     void OnValidate()       // une facon de tester et initialiser les variables d'entrées
     {
@@ -58,7 +59,11 @@ public class MovingObstacle : MonoBehaviour
 
     void Update()
     {
-        float step = speed * Time.deltaTime;
+        float step;
+        if (globalSpeed == 0)
+            step = speed * Time.deltaTime;
+        else
+            step = globalSpeed * Time.deltaTime;
         
         // faire un pas vers la direction de la position cible
         transform.position = Vector3.MoveTowards(transform.position, p_posTarget, step);

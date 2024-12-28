@@ -1,10 +1,4 @@
-﻿
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using Unity.VisualScripting;
-using UnityEngine;
-using static CreateRealTimeRoad;
+﻿using UnityEngine;
 
 public class CreateRealTimeRoad : MonoBehaviour
 {

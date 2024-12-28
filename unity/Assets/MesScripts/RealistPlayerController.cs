@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Security.Cryptography;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -55,7 +50,8 @@ public class RealistPlayerController : MonoBehaviour
     private float brake_val;
 
     private float speed_y;
-    private float speed;
+    public float speed { get; set; }
+
     private int signAccel;
     private float amplitudeSpeed;
     // définir un coefficient entre la décélaration ou le freingage et la vitesse actuelle 
@@ -64,18 +60,17 @@ public class RealistPlayerController : MonoBehaviour
     private float horizontalInput;
     private float forwardInput;
 
-
+    bool speedLock = false;
     // Start is called before the first frame update
     void Start()
     {
+        
         //StatsGame.instance.InitStatsGame(player.transform);
         speed = minSpeed;
         amplitudeSpeed = maxSpeed - minSpeed;
         RB = gameObject.GetComponent<Rigidbody>();
+        GameManager.InstanceGame.SetPlayer(this);
     }
-
-
-
 
 
     // Version Accelerer Freiner (tourner)     	Décélération automatique 
@@ -86,50 +81,10 @@ public class RealistPlayerController : MonoBehaviour
         horizontalInput = Input.GetAxis("Horizontal");
         forwardInput = Input.GetAxis("Vertical");
 
-        // DECELERATION   => la courbe indique comment diminuer l'acceleration
-        if (Mathf.Abs(forwardInput) <= 0.01f)
+        if (!speedLock)
         {
-            decel_x += Time.deltaTime;
-            if (decel_x > 1) decel_x = 1;
-
-            decel_val = decelerationSpeedCURVE.Evaluate(decel_x) * Time.deltaTime / timeFromMinToMax * RELATION_DECELERATION_SPEED;
-            accel_x -= decel_val;
-
+            updateSpeed();
         }
-        else
-        {
-            decel_x -= Time.deltaTime;
-            if (decel_x < 0) decel_x = 0;
-        }
-
-        // FREINAGE   => la courbe indique comment diminuer l'acceleration
-        if (forwardInput < -0.01f)
-        {
-            brake_x += Time.deltaTime;
-            if (brake_x > 1) brake_x = 1; ; // / RELATION_BRAKING_SPEED * Time.deltaTime;
-            brake_val = brakingSpeedCURVE.Evaluate(brake_x) * Time.deltaTime / timeFromMinToMax * RELATION_BRAKING_SPEED;
-            accel_x -= brake_val;
-
-        }
-        else
-        {
-            brake_x -= Time.deltaTime;
-            if (brake_x < 0) brake_x = 0;
-        }
-
-        // ACCELERATION
-        if (forwardInput > 0.01f)
-        {
-            accel_x += Time.deltaTime / timeFromMinToMax;
-        }
-
-        if (accel_x < 0.0f) accel_x = 0.0f;
-        if (accel_x > 1.0f) accel_x = 1.0f;
-
-        speed_y = accelerationSpeedCURVE.Evaluate(accel_x);     // retounre une vitesse en fonction du cumul d'accélaration
-        speed = minSpeed + (amplitudeSpeed) * speed_y;          // calcule la vitesse finale en fonction du max et min 
-
-
 
         deltaPosition = RB.transform.forward * speed * Time.fixedDeltaTime;
         if (boolConstraintProgressionOnRoutePlane)
@@ -141,7 +96,7 @@ public class RealistPlayerController : MonoBehaviour
             rotationAdd = Quaternion.identity;
             physicUpdateDone = false;
         }
-        // else .... update est appelée 2 fois (ou plus) avant que fixed update n'ait été appeléé
+        // else .... update est appeléegami 2 fois (ou plus) avant que fixed update n'ait été appeléé
         // dans ce cas on cumul les déplacements à effectuer avant que la prochaine maj physique n'ait lieu
         // idem , on cumul les rotations
         positionCible = positionCible + deltaPosition; // appliquer le(s) déplacement(s)
@@ -154,6 +109,68 @@ public class RealistPlayerController : MonoBehaviour
 
     }
 
+    void updateSpeed(float newSpeed = -1, bool isManual = false)
+    {
+            // DECELERATION   => la courbe indique comment diminuer l'acceleration
+            if (Mathf.Abs(forwardInput) <= 0.01f)
+            {
+                decel_x += Time.deltaTime;
+                if (decel_x > 1) decel_x = 1;
+
+                decel_val = decelerationSpeedCURVE.Evaluate(decel_x) * Time.deltaTime / timeFromMinToMax * RELATION_DECELERATION_SPEED;
+                accel_x -= decel_val;
+
+            }
+            else
+            {
+                decel_x -= Time.deltaTime;
+                if (decel_x < 0) decel_x = 0;
+            }
+
+            // FREINAGE   => la courbe indique comment diminuer l'acceleration
+            if (forwardInput < -0.01f)
+            {
+                brake_x += Time.deltaTime;
+                if (brake_x > 1) brake_x = 1; ; // / RELATION_BRAKING_SPEED * Time.deltaTime;
+                brake_val = brakingSpeedCURVE.Evaluate(brake_x) * Time.deltaTime / timeFromMinToMax * RELATION_BRAKING_SPEED;
+                accel_x -= brake_val;
+
+            }
+            else
+            {
+                brake_x -= Time.deltaTime;
+                if (brake_x < 0) brake_x = 0;
+            }
+
+            // ACCELERATION
+            if (forwardInput > 0.01f)
+            {
+                accel_x += Time.deltaTime / timeFromMinToMax;
+            }
+
+            if (accel_x < 0.0f) accel_x = 0.0f;
+            if (accel_x > 1.0f) accel_x = 1.0f;
+            speed_y = accelerationSpeedCURVE.Evaluate(accel_x);     // retounre une vitesse en fonction du cumul d'accélaration
+
+            speed = minSpeed + (amplitudeSpeed) * speed_y;          // calcule la vitesse finale en fonction du max et min 
+        
+
+    }
+
+    public void lockSpeed(float speed)
+    {
+        this.speed = speed;
+        this.speedLock = true;
+    }
+
+    public void unlockSpeed()
+    {
+        this.speedLock = false;
+    }
+    public void applyBonus(IBonus bonus)
+    {
+        StartCoroutine(bonus.applyEffect());
+    }
     void FixedUpdate()
     {
         RB.MovePosition(positionCible);
