@@ -3,43 +3,48 @@ using UnityEngine;
 
 public class SpeedBonus : IBonus
 {
-    private float targetSpeed;
-    private RealistPlayerController player;
+    private readonly float targetSpeed;
+    private readonly GameManager gameManager;
+
     public Bonus crate { get; set; }
     public float duration { get; set; }
-    public SpeedBonus(float targetSpeed, float duration)
+    public string name { get; }
+
+    public SpeedBonus(float targetSpeed, float duration, string name)
     {
+        this.name = name;
         this.targetSpeed = targetSpeed;
         this.duration = duration;
-        player = GameManager.InstanceGame.Player;
 
-        if (player == null)
+        gameManager = GameManager.InstanceGame;
+
+        if (gameManager == null)
         {
-            Debug.LogError("Player instance null GameManager");
+            Debug.LogError("GameManager instance is null");
         }
     }
 
     public IEnumerator applyEffect()
     {
-        if (player == null) yield break;
+        if (gameManager == null) yield break;
 
-        Debug.LogError("Speed : " + targetSpeed);
-        player.lockSpeed(targetSpeed);
+        ((IBonus)this).DisableCrate();
+
+        Debug.Log($"Applying SpeedBonus: {name}, Target Speed: {targetSpeed}");
+
+        gameManager.SetSpeedManually(targetSpeed);
 
         yield return new WaitForSeconds(duration);
-        Debug.Log("après 5 seconde");
+
         removeEffet();
     }
 
     public void removeEffet()
     {
-        Debug.Log("remove");
-        if (player != null)
+        if (gameManager != null)
         {
-            Debug.Log("Suppression Effet");
-            Debug.LogError("Speed : remove" );
-            player.unlockSpeed();
-            ((IBonus)this).DisableCrate();
+            Debug.Log($"Removing SpeedBonus: {name}");
+            gameManager.ResetSpeedToDefault();
         }
     }
 }

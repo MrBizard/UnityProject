@@ -7,23 +7,22 @@ public class Bonus : MonoBehaviour
     RealistPlayerController player;
 
 
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            player = other.GetComponent<RealistPlayerController>();
-            if (player)
+            List<IBonus> bonusList = isBonus ? BonusManager.BonusEffects : BonusManager.MalusEffects;
+            if (bonusList.Count > 0)
             {
-                List<IBonus> bonusList = isBonus? BonusManager.BonusEffects: BonusManager.MalusEffects;
-                if (bonusList.Count > 0)
-                {
-                    Debug.Log("Bonus ajouter");
-                    int randomBonusIndex = Random.Range(0, bonusList.Count);
-                    IBonus bonus = bonusList[randomBonusIndex];
-                    bonus.crate = this;
-                    player.applyBonus(bonus);
-                }
+                Debug.Log("Bonus ajouter");
+                int randomBonusIndex = Random.Range(0, bonusList.Count);
+                IBonus bonus = bonusList[randomBonusIndex];
+                bonus.crate = this;
+                GameManager.InstanceGame.AddBonus(bonus);
             }
-        }
+        }            
+        
     }
+
+
 }

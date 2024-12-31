@@ -8,32 +8,38 @@ public class CrateSpeedBonus : IBonus
     private float oldMaxSpeed;
     public Bonus crate { get; set; }
     public float duration { get; set; }
-    public CrateSpeedBonus(float targetSpeed, float duration)
+    public string name { get; }
+
+    public CrateSpeedBonus(float targetSpeed, float duration, string name)
     {
         this.targetSpeed = targetSpeed;
         this.duration = duration;
+        this.name = name;
     }
 
     public IEnumerator applyEffect()
     {
+        ((IBonus)this).DisableCrate();
+
         this.oldMaxSpeed = MovingObstacle.VITESSE_MAX;
         this.oldMinSpeed = MovingObstacle.VITESSE_MIN;
 
         MovingObstacle.VITESSE_MIN = this.targetSpeed;
         MovingObstacle.VITESSE_MAX = this.targetSpeed;
         MovingObstacle.globalSpeed = this.targetSpeed;
-
+        Debug.Log($"Applying CrateBonus: {name}, Target Speed: {targetSpeed}");
         yield return new WaitForSeconds(duration);
-
+            
         removeEffet();
     }
 
     public void removeEffet()
     {
-        Debug.Log("Suppression Effet");
+        Debug.Log($"Removing CrateBonus: {name}");
         MovingObstacle.VITESSE_MIN = this.oldMinSpeed;
         MovingObstacle.VITESSE_MAX = this.oldMaxSpeed;
         MovingObstacle.globalSpeed = this.oldMinSpeed;
-        ((IBonus)this).DisableCrate();
     }
+
+
 }

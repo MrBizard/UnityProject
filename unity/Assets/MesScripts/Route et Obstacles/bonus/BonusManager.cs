@@ -9,13 +9,13 @@ public static class BonusManager
     {
         BonusEffects = new List<IBonus>
         {
-            new CrateSpeedBonus(1f, 5)
+            new CrateSpeedBonus(1f, 10, "bonus : vitesse crate diminuer")
         };
 
         MalusEffects = new List<IBonus>
         {
-            new SpeedBonus(20f,5),
-            new CrateSpeedBonus(25f, 5)
+            new SpeedBonus(20f,20, "malus : vitesse joueur accélérer"),
+            new CrateSpeedBonus(25f, 20, "malus : vitesse crate augmenter")
         };
     }
 }
