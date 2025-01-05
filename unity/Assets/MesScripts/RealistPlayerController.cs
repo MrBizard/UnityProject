@@ -51,6 +51,7 @@ public class RealistPlayerController : MonoBehaviour
         RB = GetComponent<Rigidbody>();
         GameManager.InstanceGame.SetPlayer(this);
         GameManager.InstanceGame.UnlockSpeed();
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.start);
     }
 
 
@@ -59,7 +60,6 @@ public class RealistPlayerController : MonoBehaviour
         horizontalInput = Input.GetAxis("Horizontal");
         forwardInput = Input.GetAxis("Vertical");
 
-        // Mise à jour de la vitesse via le GameManager
         GameManager.InstanceGame.UpdateSpeed(forwardInput, accelerationSpeedCURVE, timeFromMinToMax);
 
         deltaPosition = RB.transform.forward * GameManager.InstanceGame.GetCurrentSpeed() * Time.fixedDeltaTime;
@@ -92,4 +92,6 @@ public class RealistPlayerController : MonoBehaviour
         RB.MoveRotation((RB.transform.rotation * rotationAdd).normalized);
         physicUpdateDone = true;
     }
+
+    
 }

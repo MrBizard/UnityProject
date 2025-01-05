@@ -12,7 +12,8 @@ public class RetourSceneJeu : MonoBehaviour
     void Start()
     {
         Invoke("fctRetourScene", delaiRetourSceneJeu);
-        
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.loose);
+
     }
 
     // Update is called once per frame

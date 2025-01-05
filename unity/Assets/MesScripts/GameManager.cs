@@ -93,6 +93,7 @@ public class GameManager
             }
             else
             {
+
                 decel_x -= Time.deltaTime;
                 if (decel_x < 0) decel_x = 0;
             }
@@ -100,6 +101,7 @@ public class GameManager
             // FREINAGE   => la courbe indique comment diminuer l'acceleration
             if (forwardInput < -0.01f)
             {
+                AudioManager.Instance.PlaySFX(AudioManager.Instance.brake);
                 brake_x += Time.deltaTime;
                 if (brake_x > 1) brake_x = 1; ; // / RELATION_BRAKING_SPEED * Time.deltaTime;
                 brake_val = Player.brakingSpeedCURVE.Evaluate(brake_x) * Time.deltaTime 
@@ -132,9 +134,10 @@ public class GameManager
 
         if (Player != null)
         {
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.bonus);
             Player.StartCoroutine(bonus.applyEffect());
         }
-    }
+    } 
 
     public void RemoveBonus(IBonus bonus)
     {

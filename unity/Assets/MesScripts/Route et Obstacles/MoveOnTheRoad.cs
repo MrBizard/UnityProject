@@ -81,4 +81,5 @@ public class MovingObstacle : MonoBehaviour
                     speed = Random.Range(VITESSE_MIN, VITESSE_MAX);
                 }
     }
+
 }
