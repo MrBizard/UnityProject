@@ -20,14 +20,12 @@ public class RealistPlayerController : MonoBehaviour
     [Tooltip("optimisation : contraindre la progression sur le plan route , sans tenu compte de l'orientation haut/bas du véhicule")]
     public bool boolConstraintProgressionOnRoutePlane;
 
-
     [Header("AVEC courbe d'animation")]
     [Range(3, 9)]
     public float minSpeed = 6f;
     [Range(10, 250)]
     public float maxSpeed = 100f;
     public float turnspeed = 20f;
-
     [Range(3, 10)]
     [Tooltip("Temps en seconde (float) pour passer de la vittesse MIN à MAX")]
     public float timeFromMinToMax = 5.0f;
@@ -64,13 +62,16 @@ public class RealistPlayerController : MonoBehaviour
 
     private float horizontalInput;
     private float forwardInput;
+
     //Game mode
     public bool isChrono;
     public float chronoTime = 10.0f;
+    SaveData Data;  
 
     //Text data
     public TextMeshProUGUI TextTime;
     public TextMeshProUGUI TextScore;
+    public string playerName;
     private string baseTimeText = "temps restant : ";
     private string baseScoreText = "Score : ";
     private string ScoreData;
@@ -81,12 +82,16 @@ public class RealistPlayerController : MonoBehaviour
     void Start()
     {
         //StatsGame.instance.InitStatsGame(player.transform);
+        //récupère toutes les données
+        Data.LoadAll();
+        isChrono = Data._gameMode.mode();
+
         speed = minSpeed;
         amplitudeSpeed = maxSpeed - minSpeed;
         RB = gameObject.GetComponent<Rigidbody>();
+        //désactive l'affichage du temps restant si mode infini
         if (!isChrono)
-        { 
-            TextTime.enabled = false;
+        {
             TextScore.enabled = false;
         }
     }
@@ -169,6 +174,9 @@ public class RealistPlayerController : MonoBehaviour
 
         if (isChrono)
         {
+            /*A FAIRE :
+            Ajout de l'ombre + sauvegarde mouvement joueur
+             */
             //actualise le temps + l'affichage
             chronoTime -= Time.deltaTime;
             TimeData = Mathf.Round(chronoTime).ToString();
@@ -197,6 +205,12 @@ public class RealistPlayerController : MonoBehaviour
 
     }
 
+    void EndChrono()
+    {
+        Data._classementData.TryAddingToClassement();
+        Data.SaveClassementIntoJSON();
+        SceneManager.LoadScene("ENDChronoScene");
+    }
     void TextDisplay()
     {
         TextTime.text = baseTimeText + TimeData;

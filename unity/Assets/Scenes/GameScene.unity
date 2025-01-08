@@ -771,11 +771,6 @@ MonoBehaviour:
   speed: 20
   turnspeed: 20
   positionRoute: {fileID: 1664036641}
-  isChrono: 1
-  timeText: {fileID: 1651269300}
-  Score: {fileID: 661307446}
-  baseTimeText: 'Temps restant : '
-  timeTextData: 
   horizontalinput: 0
   verticalinput: 0
 --- !u!4 &1261280190 stripped
@@ -956,6 +951,11 @@ MonoBehaviour:
     m_RotationOrder: 4
   RELATION_DECELERATION_SPEED: 2
   RELATION_BRAKING_SPEED: 5
+  isChrono: 1
+  chronoTime: 10
+  TextTime: {fileID: 1651269300}
+  TextScore: {fileID: 661307446}
+  playerName: 
 --- !u!54 &1261280199
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1319,7 +1319,7 @@ GameObject:
   - component: {fileID: 1651269301}
   - component: {fileID: 1651269300}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: time
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
