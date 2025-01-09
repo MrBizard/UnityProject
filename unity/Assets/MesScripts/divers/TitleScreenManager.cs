@@ -11,7 +11,10 @@ public class TitleScreenManager : MonoBehaviour
     private SaveData data;
     void Start()
     {
-        data = new SaveData(); // Initialisation de data
+        //création des fichier si inexistant
+        data = new SaveData();
+        data.InitJson();
+        //initialisation des Données de data
         data.LoadClassementFromJson();
         data.LoadGameModeFromJson();
     }

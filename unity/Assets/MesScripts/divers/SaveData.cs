@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
-public class SaveData : MonoBehaviour
+public class SaveData
 {
     //Data
     [SerializeField] public Classment _classementData = new Classment();
@@ -12,8 +13,28 @@ public class SaveData : MonoBehaviour
     //Path
     private string classementPath = Application.persistentDataPath + "/classment.json";
     private string ShadowPath = Application.persistentDataPath + "/shadow.json";
-    private string GameModePath = Application.persistentDataPath + "gamemode.json";
+    private string GameModePath = Application.persistentDataPath + "/gamemode.json";
 
+    //Init
+    public void InitJson()
+    {
+        if (!File.Exists(classementPath))
+        {
+            _classementData.init();
+            SaveClassementIntoJSON();
+            Debug.Log("Création du fichier de classement");
+        }
+        if (!File.Exists(ShadowPath))
+        {
+            SaveShadowIntoJSON();
+            Debug.Log("Création du fichier du Phantom");
+        }
+        if (!File.Exists(GameModePath))
+        {
+            SaveGameModeIntoJson();
+            Debug.Log("Création du fichier du Mode de jeu");
+        }
+    }
     //Save
     public void SaveAll()
     {
@@ -61,37 +82,53 @@ public class SaveData : MonoBehaviour
     }
 }
 
+//DATA
+//classement
 [System.Serializable]
 public class Classment
 {
-    public List<Player> classement = new List<Player>();
+    public List<Player> listScore = new List<Player>();
     public Player actualPlayer;
-
+    public void init()
+    {
+        listScore.Add(new Player());
+        listScore.Add(new Player());
+        listScore.Add(new Player());
+    }
     public void TryAddingToClassement()
     {
-        for (int i = 0; i < classement.Count; i++)
+
+        for (int i = 0; i < listScore.Count; i++)
         {
-            if (int.Parse(classement[i].Score) < int.Parse(actualPlayer.Score))
+            if (int.Parse(listScore[i].Score) < int.Parse(actualPlayer.Score))
             {
-                classement.Insert(i, actualPlayer);
-                if (i == 2)
+                Debug.Log(int.Parse(listScore[i].Score) + int.Parse(actualPlayer.Score) + "here score");
+                listScore.Insert(i, actualPlayer);
+                //limite a 3 le nombre d'élément
+                while (listScore.Count > 3)
                 {
-                    classement.RemoveAt(classement.Count - 1);
+                    listScore.RemoveAt(listScore.Count - 1);
                 }
             break;
             }
         }
     }
-    public void setActualPlayer(Player newPlayer)
+    public void setActualPlayerName(string name)
     {
-        actualPlayer = newPlayer;
+        actualPlayer.setName(name);
+    }
+    public void setActualPlayerScore(string score)
+    {
+        actualPlayer.setScore(score);
+        TryAddingToClassement();
     }
 }
+//DataJoueur
 [System.Serializable]
 public class Player
 {
     public string Name = "undefine";
-    public string Score;
+    public string Score = "0";
 
     public void setScore(string score)
     {
@@ -104,21 +141,19 @@ public class Player
     }
 }
 
-
-
+//Phantom
 [System.Serializable]
 public class Shadow
 {
     private List<Vector3> ShadowMouvement;
     public void setShadowPath(List<Vector3> shadowPath) { ShadowMouvement = shadowPath; }
 }
-
+//Mode de jeu
 [System.Serializable]
 public class GameMode
 {
-    private bool modeChrono;
+    public bool modeChrono;
 
     public void EnableChrono() { modeChrono = true; }
     public void DisableChrono() { modeChrono = false; }
-    public bool mode() {  return modeChrono; }
 }

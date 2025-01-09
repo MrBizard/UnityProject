@@ -83,8 +83,9 @@ public class RealistPlayerController : MonoBehaviour
     {
         //StatsGame.instance.InitStatsGame(player.transform);
         //récupère toutes les données
+        Data = new SaveData();
         Data.LoadAll();
-        isChrono = Data._gameMode.mode();
+        isChrono = Data._gameMode.modeChrono;
 
         speed = minSpeed;
         amplitudeSpeed = maxSpeed - minSpeed;
@@ -92,7 +93,7 @@ public class RealistPlayerController : MonoBehaviour
         //désactive l'affichage du temps restant si mode infini
         if (!isChrono)
         {
-            TextScore.enabled = false;
+            TextTime.enabled = false;
         }
     }
 
@@ -171,7 +172,7 @@ public class RealistPlayerController : MonoBehaviour
         rotationAdd = rotationAdd * Quaternion.AngleAxis(Time.fixedDeltaTime * turnspeed *
         horizontalInput, Vector3.up);
 
-
+        ScoreData = Mathf.Round(this.transform.position.z).ToString();
         if (isChrono)
         {
             /*A FAIRE :
@@ -180,16 +181,16 @@ public class RealistPlayerController : MonoBehaviour
             //actualise le temps + l'affichage
             chronoTime -= Time.deltaTime;
             TimeData = Mathf.Round(chronoTime).ToString();
-            ScoreData = Mathf.Round(this.transform.position.z).ToString();
             TextDisplay();
             //Test de fin
             if ((positionRoute.position.y - transform.position.y) > this.GetComponent<Renderer>().bounds.size.y)
-                SceneManager.LoadScene("ENDChronoScene");
+                EndChrono();
             if (chronoTime < 0.0f)
-                SceneManager.LoadScene("ENDChronoScene");
+                EndChrono();
         }
         else
         {
+            TextDisplay();
             // Test sortie de route // appliquer le(s) rotation(s)
             if ((positionRoute.position.y - transform.position.y) > this.GetComponent<Renderer>().bounds.size.y)
                 SceneManager.LoadScene("ENDscene");
@@ -207,7 +208,8 @@ public class RealistPlayerController : MonoBehaviour
 
     void EndChrono()
     {
-        Data._classementData.TryAddingToClassement();
+        Data._classementData.setActualPlayerScore(ScoreData);
+        //store player shadow ?
         Data.SaveClassementIntoJSON();
         SceneManager.LoadScene("ENDChronoScene");
     }
