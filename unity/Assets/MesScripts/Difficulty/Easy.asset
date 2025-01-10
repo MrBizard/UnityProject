@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 562c7f0cc7f2ffd42913f72c4b288588, type: 3}
+  m_Name: Easy
+  m_EditorClassIdentifier: 
+  minSpeed: 1
+  maxSpeed: 10
+  probaAllObst: 0.1
+  probaObsts:
+  - proba: 0.44444448
+    obst: {fileID: 6552816435292517630, guid: 4c729eef67ec7c94d9f61b920062aeac, type: 3}
+  - proba: 1
+    obst: {fileID: 8452273564033798985, guid: 1bbab713c72503247996863d58457795, type: 3}
+  pourcentAugmentSpeed: 3
+  pourcentAugmentProbaObst: 3
+  firsttimeBeforApplyCoef: 40
+  timeBeforApplyCoef: 20

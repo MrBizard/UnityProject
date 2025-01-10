@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class MovingObstacle : MonoBehaviour
 {
-    private const float VITESSE_MIN = 5;
-    private const float VITESSE_MAX = 15;
-    private bool VITESSE_ALEATOIRE = false;
+    public static float VITESSE_MIN = 5;
+    public static float VITESSE_MAX = 15;
+    public bool VITESSE_ALEATOIRE = false;
+    public static float globalSpeed = 0;
 
     // tooltip permet un affichage contextuel dans l'IDE 
     [Tooltip("Vitesse de deplacement de l'objet sur la largeur de la route \n " +

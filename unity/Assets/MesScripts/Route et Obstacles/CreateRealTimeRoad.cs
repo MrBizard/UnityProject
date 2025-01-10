@@ -57,12 +57,8 @@ public class CreateRealTimeRoad : MonoBehaviour
     private float coeff;                    // variable utilisée dans update
     private float distDestructionPattern;   // distance au player à partir de laquelle il faut destruire un objet non visible 
 
-    // Creer la route dans le AWAKE, première fonction appelée
-    void Awake()
-    { // création de la route intiale sans obstacle
-        initialRoad = new BuildInitRoad(posInitPattern, pattern, nbPatternsInitRoad, out lastPosPattern, trsfParentRoad);
-        
-        
+    public void setObs()
+    {
         // préparation des données
         dimObst = new Vector3[probaObsts.Length];
         for (int i = 0; i < probaObsts.Length; i++)
@@ -75,15 +71,17 @@ public class CreateRealTimeRoad : MonoBehaviour
         // e.g.  10 , 10, 30, 150 devient 10 , 20, 50 , 200
         totalProbaObst = 0.0f;
         float previousProb = 0;
-        foreach (probaObst p in probaObsts) {
+        foreach (probaObst p in probaObsts)
+        {
             totalProbaObst += p.proba;
             p.proba += previousProb;
             previousProb = p.proba;
         }
         // puis  10 , 20, 50 , 200  devient   0.05 , 0.10, 0.25,1
-        foreach (probaObst p in probaObsts) { 
+        foreach (probaObst p in probaObsts)
+        {
             p.proba /= totalProbaObst;
-            }
+        }
 
         // modification de la difficulté dans le temps 
         InvokeRepeating("UpdateDifficulty", increasePeriod, increasePeriod);
@@ -91,6 +89,13 @@ public class CreateRealTimeRoad : MonoBehaviour
         coeff = 0.0f;
 
         distDestructionPattern = player.GetComponent<Renderer>().bounds.size.z * 10;
+    }
+    // Creer la route dans le AWAKE, première fonction appelée
+    void Awake()
+    {
+        // création de la route intiale sans obstacle
+        initialRoad = new BuildInitRoad(posInitPattern, pattern, nbPatternsInitRoad, out lastPosPattern, trsfParentRoad);
+        setObs();
     }
 
     // vérifier à chaque frame , en fonction de l'avancement du véhicule player  …
