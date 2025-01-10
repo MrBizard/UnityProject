@@ -7,12 +7,10 @@ public class SaveData
 {
     //Data
     [SerializeField] public Classment _classementData = new Classment();
-    [SerializeField] public Shadow _shadow = new Shadow();
     [SerializeField] public GameMode _gameMode = new GameMode();
 
     //Path
     private string classementPath = Application.persistentDataPath + "/classment.json";
-    private string ShadowPath = Application.persistentDataPath + "/shadow.json";
     private string GameModePath = Application.persistentDataPath + "/gamemode.json";
 
     //Init
@@ -24,11 +22,6 @@ public class SaveData
             SaveClassementIntoJSON();
             Debug.Log("Création du fichier de classement");
         }
-        if (!File.Exists(ShadowPath))
-        {
-            SaveShadowIntoJSON();
-            Debug.Log("Création du fichier du Phantom");
-        }
         if (!File.Exists(GameModePath))
         {
             SaveGameModeIntoJson();
@@ -39,18 +32,12 @@ public class SaveData
     public void SaveAll()
     {
         SaveClassementIntoJSON();
-        SaveShadowIntoJSON();
         SaveGameModeIntoJson();
     }
     public void SaveClassementIntoJSON()
     {
         string classement = JsonUtility.ToJson(_classementData);
         System.IO.File.WriteAllText(classementPath, classement);
-    }
-    public void SaveShadowIntoJSON() 
-    {
-        string shadow = JsonUtility.ToJson(_shadow);
-        System.IO.File.WriteAllText(ShadowPath, shadow);
     }
     public void SaveGameModeIntoJson()
     {
@@ -62,18 +49,12 @@ public class SaveData
     public void LoadAll()
     {
         LoadClassementFromJson();
-        LoadShadowFromJson();
         LoadGameModeFromJson();
     }
     public void LoadClassementFromJson()
     {
         string classementData = System.IO.File.ReadAllText(classementPath);
         _classementData = JsonUtility.FromJson<Classment>(classementData);
-    }
-    public void LoadShadowFromJson()
-    {
-        string ShadowData = System.IO.File.ReadAllText(ShadowPath);
-        _shadow = JsonUtility.FromJson<Shadow>(ShadowData);
     }
     public void LoadGameModeFromJson()
     {
@@ -89,6 +70,7 @@ public class Classment
 {
     public List<Player> listScore = new List<Player>();
     public Player actualPlayer;
+    public Shadow bestRace = null;
     public void init()
     {
         listScore.Add(new Player());
@@ -102,7 +84,15 @@ public class Classment
         {
             if (int.Parse(listScore[i].Score) < int.Parse(actualPlayer.Score))
             {
-                Debug.Log(int.Parse(listScore[i].Score) + int.Parse(actualPlayer.Score) + "here score");
+                //si c'est le meilleur/nouveaux meilleur joueur on récupère son phantom
+                if (i == 0)
+                {
+                    bestRace = actualPlayer.Race;
+                }
+                //sinon on lui enlève pour ne pas la sauvegarder
+                else { 
+                    actualPlayer.Race.emptyShadow(); 
+                }
                 listScore.Insert(i, actualPlayer);
                 //limite a 3 le nombre d'élément
                 while (listScore.Count > 3)
@@ -129,6 +119,7 @@ public class Player
 {
     public string Name = "undefine";
     public string Score = "0";
+    public Shadow Race;
 
     public void setScore(string score)
     {
@@ -145,9 +136,38 @@ public class Player
 [System.Serializable]
 public class Shadow
 {
-    private List<Vector3> ShadowMouvement;
-    public void setShadowPath(List<Vector3> shadowPath) { ShadowMouvement = shadowPath; }
+    public shadowPosition ShadowMouvement;
+    public float interval;
+
+    public bool isShadowEmpty()
+    {
+        return ShadowMouvement.shadowQuat.Count <=0 || ShadowMouvement.shadowPath.Count <= 0;
+    }
+    public void emptyShadow()
+    {
+        ShadowMouvement.shadowQuat.Clear();
+        ShadowMouvement.shadowPath.Clear();
+    }
+    public void addShadowPos(Vector3 pos, Quaternion rot)
+    {
+        ShadowMouvement.shadowPath.Add(pos);
+        ShadowMouvement.shadowQuat.Add(rot);
+    }
+    public void setInterval(float time)
+    {
+        interval = time;
+    }
+    public float getInterval() {  return interval; }
 }
+
+//Stoque les mouvement du fantome
+[System.Serializable]
+public class shadowPosition
+{
+    public List<Vector3> shadowPath;
+    public List<Quaternion> shadowQuat;
+}
+
 //Mode de jeu
 [System.Serializable]
 public class GameMode

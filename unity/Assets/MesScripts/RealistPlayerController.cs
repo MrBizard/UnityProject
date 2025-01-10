@@ -66,7 +66,16 @@ public class RealistPlayerController : MonoBehaviour
     //Game mode
     public bool isChrono;
     public float chronoTime = 10.0f;
-    SaveData Data;  
+    SaveData Data;
+
+    //Shadow
+    public GameObject phantomPrefab;
+    //stocke la durée
+    private float timeSavingPlayerPos = 0.1f;
+    //compte à rebour pour la sauvegarde
+    private float SavingPlayerPos;
+    private Shadow phantom;
+
 
     //Text data
     public TextMeshProUGUI TextTime;
@@ -86,14 +95,25 @@ public class RealistPlayerController : MonoBehaviour
         Data = new SaveData();
         Data.LoadAll();
         isChrono = Data._gameMode.modeChrono;
+        phantom = Data._classementData.bestRace;
+        phantomPrefab.GetComponent<Renderer>().material.color = Color.blue;
 
         speed = minSpeed;
         amplitudeSpeed = maxSpeed - minSpeed;
         RB = gameObject.GetComponent<Rigidbody>();
-        //désactive l'affichage du temps restant si mode infini
+        //désactive les fonction propre au mode Chrono si en mode infini
         if (!isChrono)
         {
             TextTime.enabled = false;
+            phantomPrefab.SetActive(false);
+            Data._classementData.actualPlayer.Race.emptyShadow();
+        }
+        else
+        {
+            //met le phantom au départ
+            Data._classementData.actualPlayer.Race.emptyShadow();
+            phantomPrefab.transform.position = RB.position;
+            SavingPlayerPos = timeSavingPlayerPos;
         }
     }
 
@@ -175,9 +195,20 @@ public class RealistPlayerController : MonoBehaviour
         ScoreData = Mathf.Round(this.transform.position.z).ToString();
         if (isChrono)
         {
-            /*A FAIRE :
-            Ajout de l'ombre + sauvegarde mouvement joueur
-             */
+            //Phantom désactiver si il n'existe pas
+            if(phantom == null)
+            {
+                phantomPrefab.SetActive(false);
+            }
+
+            //sauvegarde la position et rotation du joueur
+            SavingPlayerPos -= Time.deltaTime;
+            if (SavingPlayerPos < 0.0f)
+            {
+                Data._classementData.actualPlayer.Race.addShadowPos(RB.transform.position, RB.transform.rotation);
+                SavingPlayerPos = timeSavingPlayerPos;
+            }
+            
             //actualise le temps + l'affichage
             chronoTime -= Time.deltaTime;
             TimeData = Mathf.Round(chronoTime).ToString();
@@ -209,7 +240,7 @@ public class RealistPlayerController : MonoBehaviour
     void EndChrono()
     {
         Data._classementData.setActualPlayerScore(ScoreData);
-        //store player shadow ?
+        Data._classementData.actualPlayer.Race.setInterval(timeSavingPlayerPos);
         Data.SaveClassementIntoJSON();
         SceneManager.LoadScene("ENDChronoScene");
     }
